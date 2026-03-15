@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Протокол — NLC · Muse</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: #e0e5ec;
+      color: #2d3748;
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+
+    .container {
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    /* ─── HEADER CARD ─── */
+    .header-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 32px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    /* Logo 2×2 */
+    .nlc-logo {
+      width: 68px;
+      height: 68px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px;
+      background: #e0e5ec;
+      border-radius: 16px;
+      padding: 8px;
+      box-shadow: 4px 4px 10px #b8bec7, -4px -4px 10px #ffffff;
+      flex-shrink: 0;
+    }
+
+    .logo-tile {
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 14px;
+      color: #fff;
+    }
+    .logo-n     { background: #e91e8c; }
+    .logo-arrow { background: #ff9800; font-size: 12px; }
+    .logo-l     { background: #2196f3; }
+    .logo-c     { background: #4caf50; }
+
+    .protocol-badge {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1.5px solid #d8dde6;
+      font-size: 10px;
+      font-weight: 700;
+      color: #a0aec0;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .meeting-title {
+      font-size: clamp(22px, 5vw, 34px);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #e91e8c 0%, #2196f3 55%, #4caf50 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 22px;
+      line-height: 1.2;
+    }
+
+    .meta-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #a0aec0;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 8px;
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 22px;
+    }
+
+    .participant-pill {
+      padding: 7px 18px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .summary-text {
+      font-size: 15px;
+      line-height: 1.8;
+      color: #4a5568;
+    }
+
+    /* ─── SECTION ─── */
+    .section { margin-bottom: 10px; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 15px 20px;
+      background: #e0e5ec;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 4px 4px 10px #b8bec7, -4px -4px 10px #ffffff;
+      transition: box-shadow 0.2s ease;
+      user-select: none;
+      margin-bottom: 6px;
+    }
+    .section-header:hover {
+      box-shadow: 6px 6px 14px #b8bec7, -6px -6px 14px #ffffff;
+    }
+
+    .section-badge {
+      width: 30px;
+      height: 30px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 800;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #2d3748;
+      flex: 1;
+    }
+
+    .section-toggle {
+      font-size: 20px;
+      color: #a0aec0;
+      transition: transform 0.25s ease;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+    .section-toggle.open { transform: rotate(180deg); }
+
+    /* Section content card */
+    .section-content {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 2px 14px rgba(0,0,0,0.055);
+      overflow: hidden;
+    }
+
+    /* ─── SUB-ITEMS ─── */
+    .sub-item {
+      border-bottom: 1px solid #f0f4f8;
+    }
+    .sub-item:last-child { border-bottom: none; }
+
+    .sub-item-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 15px 20px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      user-select: none;
+    }
+    .sub-item-header:hover { background: #fafbfc; }
+
+    .sub-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .sub-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #2d3748;
+      flex: 1;
+      line-height: 1.45;
+    }
+
+    .sub-arrow {
+      font-size: 17px;
+      color: #cbd5e0;
+      transition: transform 0.2s ease;
+      flex-shrink: 0;
+    }
+    .sub-arrow.open { transform: rotate(90deg); }
+
+    .sub-content {
+      display: none;
+      padding: 2px 20px 16px 40px;
+      font-size: 14px;
+      line-height: 1.78;
+      color: #718096;
+    }
+
+    /* ─── TASKS ─── */
+    .tasks-section { margin-top: 28px; }
+
+    .tasks-heading {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: #a0aec0;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .assignee-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+    .assignee-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      box-shadow: 0 0 7px currentColor;
+    }
+
+    .tasks-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+    }
+
+    .task-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+
+    .task-card-header {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 9px;
+    }
+    .task-card-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+    }
+    .task-card-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .task-desc {
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.65;
+      color: #2d3748;
+    }
+
+    .task-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .task-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      padding: 3px 9px;
+      border-radius: 8px;
+      color: #718096;
+      background: #f0f4f8;
+    }
+    .tag-green  { color: #4caf50; background: #f0faf0; }
+    .tag-blue   { color: #2196f3; background: #eff6ff; }
+    .tag-orange { color: #ff9800; background: #fff8f0; }
+
+    /* ─── FADE IN ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in {
+      opacity: 0;
+      animation: fadeUp 0.4s ease forwards;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 600px) {
+      body { padding: 14px 12px; }
+      .header-card { padding: 22px 18px; border-radius: 16px; }
+      .nlc-logo { width: 58px; height: 58px; }
+      .tasks-grid { grid-template-columns: 1fr; }
+      .section-header { padding: 13px 16px; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ══════════ HEADER ══════════ -->
+  <div class="header-card fade-in" style="animation-delay:0s;animation-fill-mode:forwards;">
+    <div class="header-top">
+      <div class="nlc-logo">
+        <div class="logo-tile logo-n">N</div>
+        <div class="logo-tile logo-arrow">→</div>
+        <div class="logo-tile logo-l">L</div>
+        <div class="logo-tile logo-c">C</div>
+      </div>
+      <span class="protocol-badge">Протокол совещания</span>
+    </div>
+
+    <div class="meeting-title">Планирование интеграции: финансы, склад и автоматизация команды</div>
+
+    <div class="meta-label">Участники</div>
+    <div class="meta-row">
+      <span class="participant-pill" style="background:#e91e8c;">Ника</span>
+      <span class="participant-pill" style="background:#2196f3;">Александр</span>
+    </div>
+
+    <div class="meta-label">Краткое резюме</div>
+    <div class="summary-text">
+      Встреча посвящена старту работы по интеграции и автоматизации бизнес-процессов. Ника уезжает через два дня и будет работать удалённо, Лиза уходит в отпуск на месяц — в этот период Ника работает напрямую с Александром: передаёт файлы, даёт доступы и принимает решения, а объём работ будет определён после получения данных. Ника описала ключевые боли: нет доступа к финансовым данным в реальном времени, ручной складской учёт с задержками и ошибками, а также вопрос о замене уходящего менеджера по продажам AI-инструментами. Договорились начать с финансового блока — Александр получает доступы к группам с ведомостями через Зум с понедельника.
+    </div>
+  </div>
+
+  <!-- ══════════ SECTION 1 ══════════ -->
+  <div class="section fade-in" style="animation-delay:0.1s;animation-fill-mode:forwards;">
+    <div class="section-header">
+      <div class="section-badge" style="background:#4caf50;">1</div>
+      <span class="section-title">Финансовая автоматизация и доступ к данным</span>
+      <span class="section-toggle">˅</span>
+    </div>
+    <div class="section-content" style="display:none;">
+
+      <div class="sub-item">
+        <div class="sub-item-header">
+          <span class="sub-dot" style="background:#4caf50;"></span>
+          <span class="sub-title">Две несинхронизированные группы с ведомостями.</span>
+          <span class="sub-arrow">›</span>
+        </div>
+        <div class="sub-content">У Ники есть две группы с ежедневными финансовыми сводками. Данные в них не совпадают — понять реальную картину без ручной сверки невозможно.</div>
+      </div>
+
+      <div class="sub-item">
+        <div class="sub-item-header">
+          <span class="sub-dot" style="background:#4caf50;"></span>
+          <span class="sub-title">Любая сводка — несколько часов ожидания.</span>
+          <span class="sub-arrow">›</span>
+        </div>
+        <div class="sub-content">Чтобы получить сводку, Нике нужно обращаться к сотрудникам. Если ответственный человек на больничном — данных может не быть несколько дней подряд.</div>
+      </div>
+
+      <div class="sub-item">
+        <div class="sub-item-header">
+          <span class="sub-dot" style="background:#4caf50;"></span>
+          <span class="sub-title">Цель: финансы в реальном времени.</span>
+          <span class="sub-arrow">›</span>
+        </div>
+        <div class="sub-content">Ника хочет видеть в реальном времени куда и сколько ушло с начала года — автоматически, без запросов к команде. Ориентир: как торговый терминал, где каждая сделка отражается мгновенно.</div>
+      </div>
+
+      <div class="sub-item">
+        <div class="sub-item-header">
+          <span class="sub-dot" style="background:#4caf50;"></span>
+          <span class="sub-title">Начинаем с финансового блока.</span>
+          <span class="sub-arrow">›</span>
+        </div>
+        <div class="sub-content">Договорились: первый приоритет — финансы, затем переход к остальным интеграциям. Это рациональная последовательность перед началом сезона.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════ SECTION 2 ══════════ -->
+  <div class="section fade-in" style="animation-delay:0.2s;animation-fill-mode:forwards;">
+    <div class="section-header">
+      <div class="section-badge" style="background:#2196f3;">2</div>
+      <span class="section-title">Автоматизация складского учёта</span>
+      <span class="section-toggle">˅</span>
+    </div>
+    <div class="section-content" style="display:none;">
+
+      <div class="sub-item">
+        <div class="sub-item-header">
+          <span class="sub-dot" style="background:#2196f3;"></span>
+          <span class="sub-title">Ручное списание — задержки и ошибки.</span>
+          <span class="sub-arrow">›</span>
+        </div>
+        <div class="sub-content">Сотрудники вносят данные в таблицу только когда освобождаются. Реальный и учётный остаток расходятся. Бывало, что проданный товар ещё числился доступным, а при запросе количество называлось неверно.</div>
+      </div>
+
+      <div class="sub-item">
+        <div class="sub-item-header">
+          <span class="sub-dot" style="background:#2196f3;"></span>
+          <span class="sub-title">Об ошибках никто не сообщает.</span>
+          <span class="sub-arrow">›</span>
+        </div>
+        <div class="sub-content">Если что-то не сходится — Ника об этом не узнаёт. Сотрудники не инициируют разговор об ошибках, считая это нормой.</div>
+      </div>
+
+      <div class="sub-item">
+        <div class="sub-item-header">
+          <span class="sub-dot" style="background:#2196f3;"></span>
+          <span class="sub-title">Цель: автоматическое списание в момент продажи.</span>
+          <span class="sub-arrow">›</span>
+        </div>
+        <div class="sub-content">Продажа должна автоматически списывать товар со склада в ту же минуту. Состояние склада — доступно в удобном приложении в любой момент без запросов к команде.</div>
+      </div>
+
+      <div class="sub-item">
+        <div class="sub-item-header">
+          <span class="sub-dot" style="background:#2196f3;"></span>
+          <span class="sub-title">Система без ручного доступа к данным.</span>
+          <span class="sub-arrow">›</span>
+        </div>
+        <div class="sub-content">Конечная цель: у сотрудников нет технической возможности менять данные вручную — всё фиксируется автоматически и прозрачно для Ники.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════ SECTION 3 ══════════ -->
+  <div class="section fade-in" style="animation-delay:0.3s;animation-fill-mode:forwards;">
+    <div class="section-header">
+      <div class="section-badge" style="background:#ff9800;">3</div>
+      <span class="section-title">Замена функций менеджера по продажам на AI-инструменты</span>
+      <span class="section-toggle">˅</span>
+    </div>
+    <div class="section-content" style="display:none;">
+
+      <div class="sub-item">
+        <div class="sub-item-header">
+          <span class="sub-dot" style="background:#ff9800;"></span>
+          <span class="sub-title">Менеджер по продажам Юля уходит.</span>
+          <span class="sub-arrow">›</span>
+        </div>
+        <div class="sub-content">Юля проработала 3–4 месяца и приняла решение уйти. Её вклад в продажи сложно оценить — ключевые решения по продвижению и скидкам принимались отдельно.</div>
+      </div>
+
+      <div class="sub-item">
+        <div class="sub-item-header">
+          <span class="sub-dot" style="background:#ff9800;"></span>
+          <span class="sub-title">Минимизация найма новых людей.</span>
+          <span class="sub-arrow">›</span>
+        </div>
+        <div class="sub-content">Ника хочет нанимать как можно меньше людей: каждый новый сотрудник — это доступ постороннего человека к внутренним процессам компании. После его ухода это становится риском.</div>
+      </div>
+
+      <div class="sub-item">
+        <div class="sub-item-header">
+          <span class="sub-dot" style="background:#ff9800;"></span>
+          <span class="sub-title">Идея: AI-ассистент вместо менеджера по продажам.</span>
+          <span class="sub-arrow">›</span>
+        </div>
+        <div class="sub-content">Прописать алгоритм работы менеджера и создать AI-ассистента, который выполняет часть функций: рекомендации по продажам, изучение предпочтений VIP-клиентов, отслеживание профиля покупателя.</div>
+      </div>
+
+      <div class="sub-item">
+        <div class="sub-item-header">
+          <span class="sub-dot" style="background:#ff9800;"></span>
+          <span class="sub-title">Перераспределение функций внутри команды.</span>
+          <span class="sub-arrow">›</span>
+        </div>
+        <div class="sub-content">Часть задач можно передать текущим сотрудникам через инструменты: автоуведомления о новых поступлениях, скрипты по продукту, инструкции по работе с клиентом. Кристина (проджект-менеджер) может стать опорой в этом направлении.</div>
+      </div>
+
+      <div class="sub-item">
+        <div class="sub-item-header">
+          <span class="sub-dot" style="background:#ff9800;"></span>
+          <span class="sub-title">Тема требует детального обсуждения.</span>
+          <span class="sub-arrow">›</span>
+        </div>
+        <div class="sub-content">Ника готова рассказать подробнее Александру и при необходимости подключить Лизу. Конечная цель — максимальная эффективность при минимальном расширении команды.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════ TASKS ══════════ -->
+  <div class="tasks-section fade-in" style="animation-delay:0.4s;animation-fill-mode:forwards;">
+    <div class="tasks-heading">// Задачи</div>
+
+    <div class="assignee-label">
+      <span class="assignee-dot" style="background:#e91e8c; color:#e91e8c;"></span>
+      <span style="color:#e91e8c;">Ника</span>
+    </div>
+
+    <div class="tasks-grid">
+
+      <div class="task-card">
+        <div class="task-card-header">
+          <span class="task-card-dot" style="background:#e91e8c;"></span>
+          <span class="task-card-name" style="color:#e91e8c;">Ника</span>
+        </div>
+        <div class="task-desc">Провести Зум с Александром: добавить его в группы с ведомостями и объяснить структуру данных</div>
+        <div class="task-tags">
+          <span class="task-tag tag-green">с понедельника</span>
+          <span class="task-tag tag-blue">задача</span>
+        </div>
+      </div>
+
+      <div class="task-card">
+        <div class="task-card-header">
+          <span class="task-card-dot" style="background:#e91e8c;"></span>
+          <span class="task-card-name" style="color:#e91e8c;">Ника</span>
+        </div>
+        <div class="task-desc">Передать Александру файлы для определения объёма работ</div>
+        <div class="task-tags">
+          <span class="task-tag tag-blue">задача</span>
+        </div>
+      </div>
+
+      <div class="task-card">
+        <div class="task-card-header">
+          <span class="task-card-dot" style="background:#e91e8c;"></span>
+          <span class="task-card-name" style="color:#e91e8c;">Ника</span>
+        </div>
+        <div class="task-desc">Собрать боли команды и передать Александру</div>
+        <div class="task-tags">
+          <span class="task-tag tag-blue">задача</span>
+        </div>
+      </div>
+
+      <div class="task-card">
+        <div class="task-card-header">
+          <span class="task-card-dot" style="background:#e91e8c;"></span>
+          <span class="task-card-name" style="color:#e91e8c;">Ника</span>
+        </div>
+        <div class="task-desc">Детально обсудить с Александром возможность замены функций менеджера на AI-инструменты</div>
+        <div class="task-tags">
+          <span class="task-tag tag-orange">требует уточнения</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+
+    // ── Section headers ──
+    document.querySelectorAll('.section-header').forEach(function (header) {
+      var toggle  = header.querySelector('.section-toggle');
+      var content = header.nextElementSibling;
+
+      header.addEventListener('click', function () {
+        if (toggle.classList.contains('open')) {
+          toggle.classList.remove('open');
+          content.style.display = 'none';
+        } else {
+          toggle.classList.add('open');
+          content.style.display = 'block';
+        }
+      });
+    });
+
+    // ── Sub-item rows ──
+    document.querySelectorAll('.sub-item-header').forEach(function (header) {
+      var arrow   = header.querySelector('.sub-arrow');
+      var content = header.nextElementSibling;
+
+      header.addEventListener('click', function () {
+        if (arrow.classList.contains('open')) {
+          arrow.classList.remove('open');
+          content.style.display = 'none';
+        } else {
+          arrow.classList.add('open');
+          content.style.display = 'block';
+        }
+      });
+    });
+
+    // ── Staggered fade-in ──
+    document.querySelectorAll('.fade-in').forEach(function (el, i) {
+      el.style.animationDelay = (i * 0.1) + 's';
+      el.style.animationFillMode = 'forwards';
+    });
+
+  });
+</script>
+</body>
+</html>
